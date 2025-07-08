@@ -1,8 +1,8 @@
 body {
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
-  color: white;
+  background: #232946;
+  color: #fffffe;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
   box-sizing: border-box;
@@ -13,8 +13,8 @@ body {
   align-items: center;
   padding: 25px 30px;
   margin-bottom: 30px;
-  border-bottom: 2px solid rgba(255,255,255,0.2);
-  background: rgba(255,255,255,0.1);
+  border-bottom: 2px solid #393d4a;
+  background: #232946;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
@@ -42,11 +42,13 @@ h2 {
 .inner {
   text-align: center;
   padding: 40px 30px;
-  background: rgba(255,255,255,0.1);
+  background: #fffffe;
   border-radius: 15px;
   margin: 30px;
   backdrop-filter: blur(10px);
   box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  color: #232946;
+  border: 1px solid #b8c1ec;
 }
 
 .inner p {
@@ -54,4 +56,19 @@ h2 {
   line-height: 1.6;
   margin: 20px 0;
   opacity: 0.9;
+}
+
+h2, h1 {
+  color: #232946;
+}
+
+.button {
+  background: linear-gradient(135deg, #eebbc3 0%, #b8c1ec 100%);
+  color: #232946;
+}
+
+.button:hover {
+  background: linear-gradient(135deg, #f6d6e7 0%, #dbeafe 100%);
+  color: #232946;
+  box-shadow: 0 8px 25px #eebbc3;
 }

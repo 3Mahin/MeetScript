@@ -1,8 +1,8 @@
 body {
   margin: 0;
   padding: 20px;
-  background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
-  color: white;
+  background: #232946;
+  color: #fffffe;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-width: 320px;
   min-height: 400px;
@@ -13,6 +13,14 @@ body {
 
 body, h2 {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  text-align: center;
 }
 
 #status, #timeRem {
@@ -26,21 +34,21 @@ body, h2 {
 
 .header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-  border-bottom: 2px solid rgba(255,255,255,0.2);
-  white-space: nowrap;
-  background: rgba(255,255,255,0.1);
-  border-radius: 15px;
+  justify-content: center;
+  background: #b8c1ec;
+  border-radius: 32px;
+  color: #232946;
   padding: 20px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  border-bottom: 2px solid #393d4a;
+  white-space: nowrap;
 }
 
 .header img {
-  height: 48px;
-  margin: 0 15px 0 0;
+  height: 64px;
+  margin: 0 0 10px 0;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
 }
 
@@ -49,6 +57,7 @@ body, h2 {
   font-weight: 600;
   margin: 0;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  text-align: center;
 }
 
 ul {
@@ -65,14 +74,16 @@ li {
   white-space: nowrap;
   margin: 8px 0;
   padding: 8px 12px;
-  background: rgba(255,255,255,0.1);
+  background: #fffffe;
   border-radius: 8px;
   backdrop-filter: blur(5px);
   transition: all 0.3s ease;
+  color: #232946;
 }
 
 li:hover {
-  background: rgba(255,255,255,0.2);
+  background: linear-gradient(135deg, #f6d6e7 0%, #dbeafe 100%);
+  color: #232946;
   transform: translateX(5px);
 }
 
@@ -82,6 +93,8 @@ li:hover {
   font-style: italic;
   margin: 5px;
   opacity: 0.8;
+  color: #eebbc3;
+  background: #232946;
 }
 
 .links {
@@ -93,13 +106,13 @@ li:hover {
 }
 
 .links p {
-  color: #ffd700;
+  color: #eebbc3;
   text-decoration: none;
   cursor: pointer;
   padding: 8px 12px;
   border-radius: 6px;
   transition: all 0.3s ease;
-  background: rgba(255,255,255,0.1);
+  background: #232946;
 }
 
 .links p:hover {
@@ -123,9 +136,9 @@ li:hover {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+  background: linear-gradient(135deg, #eebbc3 0%, #b8c1ec 100%);
   border-radius: 12px;
-  color: white;
+  color: #232946;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(238, 90, 36, 0.4);
   text-transform: uppercase;
@@ -133,9 +146,9 @@ li:hover {
 }
 
 .button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(238, 90, 36, 0.6);
-  background: linear-gradient(135deg, #ff5252 0%, #d63031 100%);
+  background: linear-gradient(135deg, #f6d6e7 0%, #dbeafe 100%);
+  color: #232946;
+  box-shadow: 0 8px 25px #eebbc3;
 }
 
 .button:active {
@@ -146,9 +159,11 @@ li:hover {
   padding: 15px;
   font-size: 12px;
   white-space: pre;
-  background: rgba(255,255,255,0.1);
+  background: #fffffe;
   border-radius: 10px;
   margin-top: 20px;
   backdrop-filter: blur(5px);
   line-height: 1.4;
+  color: #232946;
+  border: 1px solid #b8c1ec;
 }
