@@ -16,7 +16,6 @@ body {
   border-bottom: 2px solid #393d4a;
   background: #232946;
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
 
 .header-title {
@@ -52,11 +51,11 @@ label {
 
 .inner {
   margin: 0 40px;
-  padding: 30px;
-  background: #fffffe;
+  padding: 0 2px 2px 2px;
+  background: #232946;
+  color: #fffffe;
   border-radius: 15px;
   backdrop-filter: blur(10px);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
 }
 
 .options-list {
@@ -68,14 +67,15 @@ label {
 .options-list li {
   padding: 20px;
   margin: 15px 0;
-  background: #fffffe;
+  background: #232946;
+  color: #fffffe;
   border-radius: 12px;
   backdrop-filter: blur(5px);
   transition: all 0.3s ease;
 }
 
 .options-list li:hover {
-  background: rgba(255,255,255,0.15);
+  background: rgba(35,41,70,0.85);
   transform: translateX(5px);
 }
 
