@@ -91,10 +91,6 @@ body {
   display: none;
 }
 
-#transcribe {
-  display: none;
-}
-
 #saveTranscription {
   margin-top: 15px;
   display: none;

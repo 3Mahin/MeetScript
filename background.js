@@ -681,43 +681,15 @@ class TranscriptionService {
       console.log('Background: Starting transcription...');
       console.log('Background: Format:', format);
 
-      // First, download the audio file
+      // Prepare file name for the transcription upload
       const currentDate = new Date(Date.now()).toDateString();
       const fileName = `audio_${currentDate.replace(/\s/g, "_")}.${format}`;
-      
-      console.log('Background: Downloading audio file:', fileName);
-      
-      // Download the audio file using data URL
-      try {
-        console.log('Background: Using data URL for download');
-        
-        await new Promise((resolve, reject) => {
-          chrome.downloads.download({
-            url: audioDataURL,
-            filename: fileName,
-            saveAs: false
-          }, (downloadId) => {
-            if (chrome.runtime.lastError) {
-              reject(new Error(chrome.runtime.lastError.message));
-            } else {
-              console.log('Background: Audio file downloaded with ID:', downloadId);
-              resolve(downloadId);
-            }
-          });
-        });
-      } catch (error) {
-        console.error('Background: Error downloading file:', error);
-        throw new Error('Failed to download audio file');
-      }
-
-      // Create FormData and append the audio file
-      const formData = new FormData();
       
       // Convert data URL back to blob for FormData
       const blobResponse = await fetch(audioDataURL);
       const audioBlob = await blobResponse.blob();
-      
-      // Create a file from the blob with appropriate name and type
+
+      // Set the correct mimeType for the file
       let mimeType;
       if (format === 'mp3') {
         mimeType = 'audio/mpeg';
@@ -727,22 +699,12 @@ class TranscriptionService {
         // Default to wav if format is unknown
         mimeType = 'audio/wav';
       }
-      
-      console.log('Background: Creating file with format:', format, 'and mime type:', mimeType);
-      console.log('Background: Converted blob size:', audioBlob.size, 'type:', audioBlob.type);
-      
-      // Create file with explicit type
+
+      // Create a file from the blob with appropriate name and type (in memory, not downloaded)
       const file = new File([audioBlob], fileName, { type: mimeType });
-      
-      console.log('Background: File created:', file.name, 'size:', file.size, 'type:', file.type);
-      
-      // Verify the file type is correct
-      if (file.type !== mimeType) {
-        console.warn('Background: File type mismatch. Expected:', mimeType, 'Got:', file.type);
-      }
-      
-      console.log('Background: Created file:', fileName, 'with type:', mimeType);
-      
+
+      // Create FormData and append the audio file
+      const formData = new FormData();
       formData.append('file', file);
       formData.append('model', 'whisper-1');
       formData.append('response_format', 'text');

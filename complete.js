@@ -14,6 +14,51 @@ document.addEventListener('DOMContentLoaded', () => {
   let audioURL;
   let audioBlob;
   let encoding = false;
+
+  // DEBUG: Force show the transcribe button on page load
+  transcribeButton.style.display = 'inline-block';
+  console.log('[DEBUG] Forcing transcribe button visible on page load');
+
+  // Set the transcribe button handler ONCE, outside generateSave
+  transcribeButton.onclick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('[DEBUG] Transcribe button clicked');
+    await handleTranscription();
+  };
+
+  // Move handleTranscription to top-level so it's accessible
+  async function handleTranscription() {
+    try {
+      // Show transcription section
+      transcriptionSection.style.display = 'block';
+      transcriptionStatus.innerHTML = 'Downloading audio file...';
+      transcribeButton.style.display = 'none'; // Hide button during transcription
+
+      // Show loading indicator
+      transcriptionText.innerHTML = '<p><em>Downloading audio file and sending to OpenAI...</em></p>';
+
+      console.log('Content script: Starting transcription process with format:', format);
+
+      // Send transcription request to background script (blob is stored in background)
+      console.log('Content script: About to send transcription request');
+      chrome.runtime.sendMessage({
+        type: 'transcribeAudio',
+        format: format
+      });
+
+      // Update status immediately
+      transcriptionStatus.innerHTML = 'Processing transcription... Please wait.';
+      console.log('Content script: Transcription request sent');
+
+    } catch (error) {
+      console.error('Transcription error:', error);
+      transcriptionStatus.innerHTML = `Error: ${error.message}`;
+      transcriptionSection.style.display = 'block';
+      transcribeButton.style.display = 'inline-block';
+    }
+  }
+
   chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if(request.type === "createTab") {
       // Tell background script that content script is ready
@@ -98,57 +143,24 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       saveButton.style.display = "inline-block";
       
-      console.log('Content script: generateSave called with blob:', blob);
+      console.log('[DEBUG] generateSave called with blob:', blob);
       
       // Store the blob for transcription and enable transcription button only if blob exists
       if (blob === 'available') {
         // Don't store the blob in content script, it's stored in background
-        console.log('Content script: Audio blob available in background script');
+        console.log('[DEBUG] Audio blob available in background script');
         
-        // Enable transcription button
-        transcribeButton.onclick = async () => {
-          await handleTranscription();
-        };
+        // Only show the transcribe button, do not reassign its handler
         transcribeButton.style.display = "inline-block";
-        console.log('Content script: Transcription button enabled');
+        console.log('[DEBUG] Transcribe button enabled (should be visible)');
       } else {
-        console.log('Content script: No blob provided, transcription button not enabled');
+        console.log('[DEBUG] No blob provided, transcription button not enabled');
       }
     }
     
-    async function handleTranscription() {
-      try {
-        // Show transcription section
-        transcriptionSection.style.display = 'block';
-        transcriptionStatus.innerHTML = 'Downloading audio file...';
-        transcribeButton.style.display = 'none'; // Hide button during transcription
-        
-        // Show loading indicator
-        transcriptionText.innerHTML = '<p><em>Downloading audio file and sending to OpenAI...</em></p>';
-        
-        console.log('Content script: Starting transcription process with format:', format);
-        
-                // Send transcription request to background script (blob is stored in background)
-        console.log('Content script: About to send transcription request');
-        chrome.runtime.sendMessage({
-          type: 'transcribeAudio',
-          format: format
-        });
-        
-        // Update status immediately
-        transcriptionStatus.innerHTML = 'Processing transcription... Please wait.';
-        console.log('Content script: Transcription request sent');
-        
-      } catch (error) {
-        console.error('Transcription error:', error);
-        transcriptionStatus.innerHTML = `Error: ${error.message}`;
-        transcriptionSection.style.display = 'block';
-        transcribeButton.style.display = 'inline-block';
-      }
-    }
   });
   review.onclick = () => {
-    chrome.tabs.create({url: "https://chrome.google.com/webstore/detail/chrome-audio-capture/kfokdmfpdnokpmpbjhjbcabgligoelgp/reviews"});
+    chrome.tabs.create({url: "https://steamcommunity.com/profiles/76561198318169265/"});
   }
 
   async function generateMeetingMinutes(transcription) {
