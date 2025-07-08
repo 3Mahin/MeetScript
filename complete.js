@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
   });
   review.onclick = () => {
-    chrome.tabs.create({url: "https://steamcommunity.com/profiles/76561198318169265/"});
+    chrome.tabs.create({url: "https://github.com/3Mahin"});
   }
 
   async function generateMeetingMinutes(transcription) {
