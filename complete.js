@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function generateMeetingMinutes(transcription) {
     try {
       // Show loading state
-      saveTranscriptionButton.innerHTML = 'Generating Meeting Minutes...';
+      saveTranscriptionButton.innerHTML = 'Generate Meeting Minutes...';
       saveTranscriptionButton.style.pointerEvents = 'none';
       
       // Send request to background script to generate meeting minutes

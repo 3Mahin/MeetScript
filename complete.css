@@ -219,3 +219,7 @@ body {
   color: rgba(255,255,255,0.8);
   font-size: 14px;
 }
+
+#close {
+  text-align: center;
+}

@@ -366,7 +366,7 @@ const audioCapture = (timeLimit, muteTab, format, quality, limitRemoved) => {
         // Disabled audio feedback to prevent hearing own voice during recording
         // if(!muteTab) {
         //   let audio = new Audio();
-        //   audio.srcObject = destination.stream;
+        //   audio.srcObject = tabStream;
         //   audio.play();
         // }
       })
@@ -928,91 +928,82 @@ window.MeetingMinutesService = MeetingMinutesService;
 
 // Fallback recording function that records tab and mic separately
 function startFallbackRecording(tabStream, micStream, format, quality, limitRemoved, timeLimit, muteTab) {
-  console.log('Background: Starting fallback recording method');
-  
+  console.log('Background: Starting fallback recording method (MIXED)');
+
   let startTabId;
   let completeTabID;
   let audioURL = null;
   let audioBlob = null;
-  
+
   chrome.tabs.query({active:true, currentWindow: true}, (tabs) => startTabId = tabs[0].id);
-  
-  // Record tab audio
-  const tabAudioCtx = new AudioContext();
-  const tabSource = tabAudioCtx.createMediaStreamSource(tabStream);
-  const tabRecorder = new Recorder(tabSource);
-  tabRecorder.setEncoding(format);
+
+  // Create a new AudioContext and mix tab + mic
+  const audioCtx = new AudioContext();
+  const tabSource = audioCtx.createMediaStreamSource(tabStream);
+  const micSource = audioCtx.createMediaStreamSource(micStream);
+
+  // Create gain nodes for mixing
+  const mixer = audioCtx.createGain();
+  const tabGain = audioCtx.createGain();
+  const micGain = audioCtx.createGain();
+  tabGain.gain.value = 0.7;
+  micGain.gain.value = 0.8;
+  tabSource.connect(tabGain);
+  micSource.connect(micGain);
+  tabGain.connect(mixer);
+  micGain.connect(mixer);
+
+  // Create a MediaStreamDestination for the mixed audio
+  const destination = audioCtx.createMediaStreamDestination();
+  mixer.connect(destination);
+
+  // Optionally monitor the mixed audio
+  // if (!muteTab) {
+  //   try {
+  //     const monitor = audioCtx.createMediaStreamSource(destination.stream);
+  //     monitor.connect(audioCtx.destination);
+  //     console.log('Background: Monitoring mixed audio (tab + mic) enabled (fallback).');
+  //   } catch (e) {
+  //     console.error('Background: Failed to enable monitoring of mixed audio (fallback):', e);
+  //   }
+  // }
+
+  // Create a MediaStreamSource from the mixed stream for the Recorder
+  const mixedSource = audioCtx.createMediaStreamSource(destination.stream);
+  let mediaRecorder = new Recorder(mixedSource);
+  mediaRecorder.setEncoding(format);
   if(limitRemoved) {
-    tabRecorder.setOptions({timeLimit: 10800});
+    mediaRecorder.setOptions({timeLimit: 10800});
   } else {
-    tabRecorder.setOptions({timeLimit: timeLimit/1000});
+    mediaRecorder.setOptions({timeLimit: timeLimit/1000});
   }
   if(format === "mp3") {
-    tabRecorder.setOptions({mp3: {bitRate: quality}});
+    mediaRecorder.setOptions({mp3: {bitRate: quality}});
   }
-  
-  // Record microphone audio
-  const micAudioCtx = new AudioContext();
-  const micSource = micAudioCtx.createMediaStreamSource(micStream);
-  const micRecorder = new Recorder(micSource);
-  micRecorder.setEncoding(format);
-  if(limitRemoved) {
-    micRecorder.setOptions({timeLimit: 10800});
-  } else {
-    micRecorder.setOptions({timeLimit: timeLimit/1000});
-  }
-  if(format === "mp3") {
-    micRecorder.setOptions({mp3: {bitRate: quality}});
-  }
-  
-  let tabBlob = null;
-  let micBlob = null;
-  
-  tabRecorder.onComplete = (recorder, blob) => {
-    console.log('Background: Tab recording complete');
-    tabBlob = blob;
-    checkAndCombineRecordings();
-  };
-  
-  micRecorder.onComplete = (recorder, blob) => {
-    console.log('Background: Microphone recording complete');
-    micBlob = blob;
-    checkAndCombineRecordings();
-  };
-  
-  function checkAndCombineRecordings() {
-    if (tabBlob && micBlob) {
-      console.log('Background: Both recordings complete, combining...');
-      combineRecordings(tabBlob, micBlob);
-    }
-  }
-  
-  function combineRecordings(tabBlob, micBlob) {
-    // For now, just use the tab recording as the main recording
-    // In a full implementation, you'd want to properly mix the audio files
-    console.log('Background: Using tab recording as primary, mic as backup');
-    audioURL = window.URL.createObjectURL(tabBlob);
-    audioBlob = tabBlob;
-    globalAudioBlob = tabBlob;
+
+  mediaRecorder.onComplete = (recorder, blob) => {
+    audioURL = window.URL.createObjectURL(blob);
+    audioBlob = blob;
+    globalAudioBlob = blob;
     globalAudioURL = audioURL;
-    
     if(completeTabID) {
-      console.log('Background: Sending encodingComplete with blob size:', tabBlob.size);
+      console.log('Background: Sending encodingComplete with blob size:', blob.size);
       chrome.tabs.sendMessage(completeTabID, {type: "encodingComplete", audioURL, hasAudioBlob: true});
     }
+    mediaRecorder = null;
   }
-  
-  // Start both recordings
-  tabRecorder.startRecording();
-  micRecorder.startRecording();
-  
+  mediaRecorder.onEncodingProgress = (recorder, progress) => {
+    if(completeTabID) {
+      chrome.tabs.sendMessage(completeTabID, {type: "encodingProgress", progress: progress});
+    }
+  }
+
   // Set up stop/cancel handlers
   function onStopCommand(command) {
     if (command === "stop") {
       stopCapture();
     }
   }
-  
   function onStopClick(request) {
     if(request === "stopCapture") {
       stopCapture();
@@ -1020,17 +1011,15 @@ function startFallbackRecording(tabStream, micStream, format, quality, limitRemo
       cancelCapture();
     }
   }
-  
   chrome.commands.onCommand.addListener(onStopCommand);
   chrome.runtime.onMessage.addListener(onStopClick);
-  
+
   const stopCapture = function() {
     let endTabId;
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
       endTabId = tabs[0].id;
       if(startTabId === endTabId){
-        tabRecorder.finishRecording();
-        micRecorder.finishRecording();
+        mediaRecorder.finishRecording();
         chrome.tabs.create({url: "complete.html"}, (tab) => {
           completeTabID = tab.id;
           let completeCallback = () => {
@@ -1044,30 +1033,25 @@ function startFallbackRecording(tabStream, micStream, format, quality, limitRemo
       }
     })
   }
-  
   const cancelCapture = function() {
     let endTabId;
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
       endTabId = tabs[0].id;
       if(startTabId === endTabId){
-        tabRecorder.cancelRecording();
-        micRecorder.cancelRecording();
+        mediaRecorder.cancelRecording();
         closeStream(endTabId);
       }
     })
   }
-  
   const closeStream = function(endTabId) {
     chrome.commands.onCommand.removeListener(onStopCommand);
     chrome.runtime.onMessage.removeListener(onStopClick);
-    tabAudioCtx.close();
-    micAudioCtx.close();
+    mediaRecorder.onTimeout = () => {};
+    audioCtx.close();
     tabStream.getAudioTracks()[0].stop();
     micStream.getAudioTracks()[0].stop();
     sessionStorage.removeItem(endTabId);
     chrome.runtime.sendMessage({captureStopped: endTabId});
   }
-  
-  tabRecorder.onTimeout = stopCapture;
-  micRecorder.onTimeout = stopCapture;
+  mediaRecorder.onTimeout = stopCapture;
 }
