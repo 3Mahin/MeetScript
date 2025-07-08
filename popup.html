@@ -3,6 +3,7 @@
     <title>MeetScript</title>
     <script src="popup.js"></script>
     <link rel="stylesheet" href="popup.css" type="text/css">
+    <meta charset="UTF-8">
   </head>
   <body>
     <div class="header"><img src="./icon2.png"/> <h1>MeetScript</h1></div>
@@ -13,13 +14,16 @@
       <div class="button" id="finish">Save Capture</div>
       <div class="button" id="cancel">Cancel Capture</div>
     </div>
-    <div class="notes">🎤 Records both tab audio and microphone simultaneously!
+    <div class="notes"><b>⚠️ Warning:</b> This extension is still in beta and may have bugs.
     
-After capture is finished, a new tab will be opened automatically for you to
-name and save the file. Please do not close the tab before saving the file!</div>
-    <ul> Hotkeys:
-      <li id="startKey">Ctrl/Command + Shift +   to start capture on current tab</li>
-      <li id="endKey">Ctrl/Command + Shift + X to stop capture on current tab</li>
+After recording is saved, a new tab will be opened automatically to
+name and save the file.
+
+Please do not close the tab before saving the file!</div>
+    <ul> Current Features:
+      <li><b>Saving the audio recording</b> (multiple file format)</li>
+      <li><b>Transcriptions</b> (timestamps coming soon)</li>
+      <li><b>Meeting Minutes Generation</b></li>
     </ul>
     <p class="extra">Hotkeys may not work if another extension is using the same hotkeys</p>
     <p class="extra">Currently the max capture time is 20 minutes due to Chrome memory contraints</p>

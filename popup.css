@@ -34,7 +34,7 @@ h1 {
 
 .header {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   background: #b8c1ec;
@@ -48,7 +48,7 @@ h1 {
 
 .header img {
   height: 64px;
-  margin: 0 0 10px 0;
+  margin: 0 15px 0 0;
   filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
 }
 
