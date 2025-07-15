@@ -1,6 +1,6 @@
 # MeetScript
 
-**MeetScript (Mahin’s Recorder)** is a robust, user-friendly Chrome extension that enables seamless tab and microphone audio capture, high-accuracy transcription via OpenAI Whisper, and automated generation of professional meeting minutes using GPT-4o.
+**MeetScript** is a robust, user-friendly Chrome extension that enables seamless tab and microphone audio capture, high-accuracy transcription via OpenAI Whisper, and automated generation of professional meeting minutes using GPT-4o.
 
 ---
 
